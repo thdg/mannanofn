@@ -26,7 +26,7 @@ def filter(names, **kwargs):
     pass
 
 
-def ngram(names, n=(3, 5)):
+def ngram(names, n=(2, 3)):
     cv = CountVectorizer(ngram_range=n, analyzer="char", lowercase=False)
     X = cv.fit_transform(names)
     return cv, X
@@ -36,11 +36,11 @@ def train(names, y):
     cv, X = ngram(names)
     clf = svm.LinearSVC()
     #clf = DecisionTreeClassifier()
-    #clf = svm.SVC(kernel="precomputed")
-    #from ssk import build_gram_matrix as bgm
-    #print("start ssk")
-    #X = bgm(names, names, 0.8, 2)
-    #print("finish ssk")
+#    clf = svm.SVC(kernel="precomputed")
+#    from ssk import build_gram_matrix as bgm
+#    print("start ssk")
+#    X = bgm(names, names, 0.05, 3)
+#    print("finish ssk")
     clf.fit(X, y)
     return clf, cv
 
@@ -81,7 +81,7 @@ def next_letter(nexts, seed):
 
     count = np.array(count)
     total = np.sum(count)
-    i = np.random.choice(np.arange(len(letters)), 1, p=count/total)
+    i = np.random.choice(np.arange(len(letters)), 1, p=count/total)[0]
     return letters[i]
 
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     x, y, X, Y = split_data(n, ratio=.95)
     clf, cv = train(x, y)
     #from ssk import build_gram_matrix as bgm
-    #py = clf.predict(bgm(X, x, 0.8, 2))
+    #py = clf.predict(bgm(X, x, 0.05, 3))
     py = clf.predict(cv.transform(X))
     for predicted, true in zip(py, Y):
         print(predicted, true, predicted == true)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     pcat = clf.predict(cv.transform(nn))
     #from ssk import build_gram_matrix as bgm
-    #pcat = clf.predict(bgm(nn, x, 0.8, 2))
+    #pcat = clf.predict(bgm(nn, x, 0.05, 3))
 
     for name, cat in zip(nn, pcat):
         print(name, cat)
