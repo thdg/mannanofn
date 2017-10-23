@@ -17,31 +17,30 @@ def predict(x):
     return clf.predict(cv.transform(x))
 
 
+def input_error(message):
+    return jsonify({"error": message})
+
+
 @app.route('/mannanofn/', methods=['GET'])
 def mannanofn():
-    error = None
-
     try:
         n = int(request.args.get('n', '1'))
         if not 0 < n <= 100:
-            error = "n must satisfy 0 < n <= 100."
+            return input_error("n must satisfy 0 < n <= 100.")
     except ValueError:
-        error = "n should be integer."
+        return input_error("n should be integer.")
 
     seed = request.args.get('seed', '').title()
     try:
         classify = bool(request.args.get('classify', False))
     except ValueError:
-        error = "Classfy should be boolean."
+        return input_error("Classfy should be boolean.")
 
     try:
         name_list = list(set(generate(g, seed=seed) for i in range(n)))
         name_list.sort()
     except ValueError:
-        error = "Can't find names for seed \"%s\"." % seed
-
-    if error:
-        return jsonify({"error": error})
+        return input_error("Can't find names for seed \"%s\"." % seed)
 
     if classify:
         y = predict(name_list)
